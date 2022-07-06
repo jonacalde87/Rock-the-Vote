@@ -1,42 +1,68 @@
-import React, { useContext } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import Navbar from './components/Navbar.js'
-import Auth from './components/authentication/Auth'
-import Profile from './components/Profile.js'
-import Public from './components/Public.js'
-import ProtectedRoute from './components/ProtectedRoute.js'
-import { UserContext } from './context/UserProvider.js'
+import React, { useContext } from 'react';
+import Nav from './components/Tools/Nav';
+import Home from './pages/Home';
+import Profile from './pages/Profile';
+import Public from './pages/Public';
+import RequireAuth from './components/ProtectedRoutes/RequireAuth';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { UserContext } from './context/UserProvider';
+import './css/styles.css'
 
 export default function App() {
-  const { token, logout } = useContext(UserContext)
+  const {
+    signup,
+    login,
+    user,
+    token,
+    errMsg,
+    logout,
+    addIssue,
+    deleteIssue,
+    userIssues,
+    editIssue,
+    userAxios,
+    getMyIssues,
+  } = useContext(UserContext);
 
   return (
-    <div className="app">
-      <Navbar logout={logout} token={token} />
+    <BrowserRouter>
+      <Nav logout={logout} token={token} />
       <Routes>
         <Route
-          path="/"
-          element={token ? <Navigate to="/profile" /> 
-          : 
-          <Auth />}
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute token={token} redirectTo="/">
-              <Profile />
-            </ProtectedRoute>
+          path="/*"
+          element={token ? <Navigate to="/profile" />
+            :
+            <Home
+              user={user}
+              signup={signup}
+              login={login}
+              errMsg={errMsg}
+            />
           }
         />
         <Route
-          path="/public"
-          element={
-            <ProtectedRoute token={token} redirectTo="/">
-              <Public />
-            </ProtectedRoute>
-          }
-        />
+          element={<RequireAuth />}>
+          <Route
+            path="/profile"
+            element={
+              <Profile
+                user={user}
+                addIssue={addIssue}
+                deleteIssue={deleteIssue}
+                userIssues={userIssues}
+                editIssue={editIssue}
+                getMyIssues={getMyIssues}
+              />
+            }
+          />
+          <Route
+            path="/public"
+            element={
+              <Public userAxios={userAxios} user={user} />
+            }
+          />
+        </Route>
       </Routes>
-    </div>
-  )
+    </BrowserRouter>
+  );
 }

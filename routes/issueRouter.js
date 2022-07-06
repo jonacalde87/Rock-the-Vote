@@ -2,6 +2,7 @@ const express = require('express');
 const issueRouter = express.Router();
 const Issue = require('../models/issue');
 
+
 // GET ALL issues
 issueRouter.get('/', (req, res, next) => {
   Issue.find((err, issues) => {
@@ -50,13 +51,14 @@ issueRouter.delete('/:issueId', (req, res, next) => {
       }
       return res
         .status(200)
-        .send(`Successfully deleted issue (${deletedIssue.title}) by user: ${req.user.username}`);
+        .send(`Successfully deleted issue by user: ${req.user.username}`);
     }
   );
 });
 
 // Update issue by Issue ID and only by the creator of the issue
 issueRouter.put('/:issueId', (req, res, next) => {
+  console.log('req', req)
   Issue.findOneAndUpdate(
     { _id: req.params.issueId, user: req.user._id },
     req.body,
@@ -68,7 +70,7 @@ issueRouter.put('/:issueId', (req, res, next) => {
       }
       return res
         .status(200)
-        .send(`Successfully updated (${updatedIssue.title}) by user: ${req.user.username}`);
+        .send(`Issue ${updatedIssue.title} updated by ${req.user.username}`);
     }
   );
 });
